@@ -1,7 +1,7 @@
 export enum TipoVeiculo {
   Motocicleta = 1,
-  VeiculoDePasseio = 2,
-  Caminhao = 3,
+  Carro = 2,
+  Van = 3,
   Onibus = 4,
-  Van = 5,
+  Caminhao = 5,
 }

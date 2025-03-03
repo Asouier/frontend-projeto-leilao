@@ -1,10 +1,10 @@
 {
   "compilerOptions": {
     "target": "ES2022",
-    "lib": ["ES2023"],
+    "lib": ["ES2023", "dom"],
     "module": "ESNext",
     "skipLibCheck": true,
-    
+    "incremental": true,
 
     /* Bundler mode */
     "moduleResolution": "bundler",
@@ -30,7 +30,6 @@
     "src/**/*.tsx",
     "src/**/*.vue",
     "vite.config.ts"
-  ],"exclude": ["node_modules"]
+  ],
+  "exclude": ["node_modules"]
 }
-
-

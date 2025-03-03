@@ -1,6 +1,7 @@
 <script setup lang="ts">
 import { ref } from "vue";
 import { ICadastroImovel } from "@/models/dto/ICadastroImovel";
+import { apiImovel } from "@/services/Imovel";
 
 const form = ref();
 const imovel = ref<ICadastroImovel>({
@@ -22,7 +23,11 @@ const rules = {
 
 async function submitForm() {
   const { valid } = await form.value.validate();
-  if (valid) alert("Formulário enviado com sucesso!");
+  if (valid) {
+    apiImovel.adicionar(imovel.value).then(() => {
+      alert("Formulário enviado com sucesso!");
+    });
+  }
 }
 function autoFill() {
   imovel.value = {

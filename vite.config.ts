@@ -1,11 +1,9 @@
-// Plugins
 import AutoImport from "unplugin-auto-import/vite";
 import Components from "unplugin-vue-components/vite";
 import Vue from "@vitejs/plugin-vue";
 import VueRouter from "unplugin-vue-router/vite";
 import Vuetify, { transformAssetUrls } from "vite-plugin-vuetify";
 
-// Utilities
 import { defineConfig } from "vite";
 
 export default defineConfig({

@@ -1,9 +1,13 @@
 <script setup lang="ts">
+import { ILogin } from "@/models/dto/ILogin";
+import { apiCredencial } from "@/services/Credencial";
+import { useAppStore } from "@/store/app";
 import { ref } from "vue";
 
+const appStore = useAppStore();
 const form = ref();
-const loginData = ref({
-  login: "",
+const loginData = ref<ILogin>({
+  nomeUsuario: "",
   senha: "",
 });
 
@@ -13,26 +17,26 @@ const rules = {
     (v && v.length >= length) || `Mínimo ${length} caracteres`,
 };
 
-// Emulando submit
-async function submitForm() {
+async function login() {
   const { valid } = await form.value.validate();
   if (valid) {
-    alert("Login realizado com sucesso!");
-    console.log("Dados de login:", loginData.value);
+    apiCredencial.acessar(loginData.value).then((res) => {
+      appStore.setLogin(res.resultado);
+      appStore.token = res.token;
+    });
   }
 }
 
 function autoFill(perfil: number) {
   if (perfil == 1) {
     loginData.value = {
-      login: "representante.loja.maria",
-
-      senha: "123456",
+      nomeUsuario: "loja.maria",
+      senha: "Loja123456Maria",
     };
   } else {
     loginData.value = {
-      login: "administrador",
-      senha: "123456789",
+      nomeUsuario: "administrador",
+      senha: "Adm12345@2025",
     };
   }
 }
@@ -47,7 +51,7 @@ function resetForm() {
     <v-form ref="form">
       <v-text-field
         label="Login"
-        v-model="loginData.login"
+        v-model="loginData.nomeUsuario"
         :rules="[rules.required]"
       />
       <v-text-field
@@ -62,7 +66,7 @@ function resetForm() {
 
       <v-row justify="space-between" class="w-100">
         <v-col class="d-flex justify-start">
-          <v-btn color="primary" @click="submitForm">Entrar</v-btn>
+          <v-btn color="primary" @click="login">Entrar</v-btn>
         </v-col>
         <v-col class="d-flex justify-center">
           <v-btn class="mr-2" color="secondary" @click="autoFill(1)">

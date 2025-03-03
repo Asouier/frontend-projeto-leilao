@@ -1,0 +1,51 @@
+@import url("vue-toastification/dist/index.css");
+@media (max-width: 600px) {
+  .Vue-Toastification__container.top-center {
+    top: 30px !important;
+    .Vue-Toastification__toast {
+      max-width: 100%;
+      margin-left: 20px;
+      margin-right: 20px;
+      width: auto !important;
+      border-radius: 8px !important;
+    }
+  }
+}
+.Vue-Toastification__container {
+  padding: 0;
+
+  .Vue-Toastification__toast {
+    padding: 14px 16px;
+    width: 870px !important;
+    max-width: 90vw;
+    min-height: 40px;
+  }
+
+  &.top-center {
+    top: 50px;
+    width: 100vw;
+    left: 0;
+    margin: 0;
+  }
+}
+.Vue-Toastification__toast-- {
+  &success {
+    background-color: #067a74;
+  }
+  &error {
+    background-color: #a13246;
+  }
+}
+.Vue-Toastification__toast {
+  font-family: "Roboto";
+  font-weight: 700;
+  font-size: 14px;
+  line-height: 150%;
+  letter-spacing: 0.3px;
+  .toast-hr {
+    border-left-color: rgba(255, 255, 255, 0.2);
+    border-left-style: solid;
+    border-left-width: 2px;
+    height: 25px;
+  }
+}

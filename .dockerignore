@@ -1,2 +1,30 @@
 node_modules/
+
+# Ignorar pastas de build e distribuição
 dist/
+build/
+.deploy/
+
+# Ignorar arquivos de configuração local e ambiente
+.env
+.env.local
+.env.development
+.env.production
+
+# Ignorar arquivos de log e cache
+*.log
+.cache/
+.temp/
+
+# Ignorar arquivos do sistema de controle de versão
+.git/
+.gitignore
+
+# Ignorar arquivos do IDE/Editor
+.idea/
+.vscode/
+*.suo
+*.ntvs*
+*.njsproj
+*.sln
+*.sw?

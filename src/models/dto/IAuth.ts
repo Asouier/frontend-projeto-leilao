@@ -1,4 +1,3 @@
 export interface IAuthAPI {
-  accessToken: string;
-  expiresIn: number;
+  token: string;
 }

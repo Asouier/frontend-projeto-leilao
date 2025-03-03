@@ -1,21 +1,16 @@
-import { IAuthAPI } from "@/models/auth";
+import { IAuthAPI } from "@/models/dto/IAuth";
 import axios from "axios";
 
-const apiURL = process.env.VUE_APP_API_URL;
-const secret = process.env.VUE_APP_AZUREAD_SECRET;
-const clientId = process.env.VUE_APP_AZUREAD_CLIENTID;
-const scope = encodeURIComponent(process.env.VUE_APP_AZUREAD_SCOPE as string);
+const urlBase = import.meta.env.VITE_API_URL;
+//const urlBase = "http://backend:5000/api"; //temporário
 
 export const obterTokenApi = async () => {
   let novoAccessToken: IAuthAPI = {
-    accessToken: "",
-    expiresIn: 0,
+    token: "",
   };
 
   await axios
-    .get(
-      `${apiURL}/api/v1/token?Scope=${scope}&ClientId=${clientId}&Secret=${secret}`
-    )
+    .get(`${urlBase}/credencial/tokenparateste/desenvolvimento`)
     .then((response) => {
       novoAccessToken = response.data as IAuthAPI;
     })

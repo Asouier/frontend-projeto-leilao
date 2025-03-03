@@ -6,40 +6,40 @@
       </v-avatar>
 
       <div class="info-container">
-        <div v-if="infoLoginStore.nomeUsuario">
-          <strong>Usuário:</strong> {{ infoLoginStore.nomeUsuario }}
+        <div v-if="appStore.Login.nomeUsuario">
+          <strong>Usuário:</strong> {{ appStore.Login.nomeUsuario }}
         </div>
-        <div v-if="infoLoginStore.nomeCompleto">
-          <strong>Nome:</strong> {{ infoLoginStore.nomeCompleto }}
+        <div v-if="appStore.Login.nomeCompleto">
+          <strong>Nome:</strong> {{ appStore.Login.nomeCompleto }}
         </div>
-        <div v-if="infoLoginStore.nomeFantasia">
-          <strong>Nome Fantasia:</strong> {{ infoLoginStore.nomeFantasia }}
+        <div v-if="appStore.Login.nomeFantasia">
+          <strong>Nome Fantasia:</strong> {{ appStore.Login.nomeFantasia }}
         </div>
-        <div v-if="infoLoginStore.cidade">
-          <strong>Cidade:</strong> {{ infoLoginStore.cidade }}
+        <div v-if="appStore.Login.cidade">
+          <strong>Cidade:</strong> {{ appStore.Login.cidade }}
         </div>
-        <div v-if="infoLoginStore.email">
-          <strong>Email:</strong> {{ infoLoginStore.email }}
+        <div v-if="appStore.Login.email">
+          <strong>Email:</strong> {{ appStore.Login.email }}
         </div>
-        <div v-if="infoLoginStore.cargoFuncao">
-          <strong>Cargo:</strong> {{ infoLoginStore.cargoFuncao }}
+        <div v-if="appStore.Login.cargoFuncao">
+          <strong>Cargo:</strong> {{ appStore.Login.cargoFuncao }}
         </div>
-        <div v-if="infoLoginStore.permissaoId">
-          <strong>Permissão ID:</strong> {{ infoLoginStore.permissaoId }}
+        <div v-if="appStore.Login.permissaoId">
+          <strong>Permissão ID:</strong> {{ appStore.Login.permissaoId }}
         </div>
-        <div v-if="infoLoginStore.regiaoResponsavel">
+        <div v-if="appStore.Login.regiaoResponsavel">
           <strong>Região Responsável:</strong>
-          {{ infoLoginStore.regiaoResponsavel }}
+          {{ appStore.Login.regiaoResponsavel }}
         </div>
-        <div v-if="infoLoginStore.categoriaResponsavel">
+        <div v-if="appStore.Login.categoriaResponsavel">
           <strong>Categoria Responsável:</strong>
-          {{ infoLoginStore.categoriaResponsavel }}
+          {{ appStore.Login.categoriaResponsavel }}
         </div>
       </div>
 
       <v-spacer></v-spacer>
 
-      <v-btn v-if="isLoggedIn" icon @click="logout" variant="outlined">
+      <v-btn v-if="!loginStatus" icon @click="logout" variant="outlined">
         Sair
       </v-btn>
 
@@ -53,25 +53,26 @@ import { useAppStore } from "@/store/app";
 import { computed } from "vue";
 import { useRouter } from "vue-router";
 
-const infoLoginStore = useAppStore();
+const appStore = useAppStore();
 const router = useRouter();
 
-const isLoggedIn = computed(() => !!infoLoginStore.nomeUsuario);
+const loginStatus = computed(() => appStore.loginStatus);
 
 const logout = () => {
-  infoLoginStore.$reset();
-  router.push("/login");
+  appStore.clearLogin();
+  appStore.token = "";
 };
 
 const login = () => {
-  router.push("/login");
+  // adicionar rota no futuro
 };
 </script>
 
 <style scoped>
 .info-container {
   display: flex;
-  flex-direction: column;
-  gap: 4px;
+  flex-direction: row;
+  gap: 34px;
+  font-size: 15px;
 }
 </style>

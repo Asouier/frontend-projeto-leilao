@@ -1,6 +1,8 @@
 <script setup lang="ts">
 import { ref } from "vue";
 import { ICadastroCliente } from "@/models/dto/ICadastroCliente";
+import { apiCliente } from "@/services/Cliente";
+import { TYPE, useToast } from "@/plugins/toast";
 
 const form = ref();
 const cliente = ref<ICadastroCliente>({
@@ -36,7 +38,14 @@ const rules = {
 // Funções do formulário
 async function submitForm() {
   const { valid } = await form.value.validate();
-  if (valid) alert("Formulário enviado com sucesso!");
+  if (valid) {
+    try {
+      await apiCliente.cadastrar(cliente.value);
+      useToast("Formulário enviado com sucesso!");
+    } catch (error) {
+      useToast("Erro ao cadastrar", { tipo: TYPE.ERROR });
+    }
+  }
 }
 function autoFill() {
   cliente.value = {

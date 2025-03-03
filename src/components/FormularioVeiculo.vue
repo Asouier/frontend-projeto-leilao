@@ -1,6 +1,7 @@
 <script setup lang="ts">
 import { ref } from "vue";
 import { ICadastroVeiculo } from "@/models/dto/ICadastroVeiculo";
+import { apiVeiculo } from "@/services/Veiculo";
 
 const form = ref();
 const veiculo = ref<ICadastroVeiculo>({
@@ -21,7 +22,11 @@ const veiculo = ref<ICadastroVeiculo>({
 
 async function submitForm() {
   const { valid } = await form.value.validate();
-  if (valid) alert("Formulário enviado com sucesso!");
+  if (valid) {
+    apiVeiculo.adicionar(veiculo.value).then((res) => {
+      console.log("Veículo cadastrado:", res);
+    });
+  }
 }
 function autoFill() {
   veiculo.value = {

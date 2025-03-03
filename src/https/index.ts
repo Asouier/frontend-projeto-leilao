@@ -1,7 +1,9 @@
 import { obterTokenApi } from "@/services/token";
+
 import axios, { AxiosRequestConfig } from "axios";
 
-const urlBase = process.env.VUE_APP_API_URL;
+const urlBase = import.meta.env.VITE_API_URL;
+//const urlBase = "http://backend:5000/api"; //temporário
 
 const http = axios.create({
   baseURL: urlBase,
@@ -10,7 +12,7 @@ const http = axios.create({
 http.interceptors.request.use(
   async (config) => {
     const data = await obterTokenApi();
-    config.headers.Authorization = `Bearer ${data.accessToken}`;
+    config.headers.Authorization = `Bearer ${data.token}`;
     return config;
   },
   (error) => {
@@ -24,7 +26,7 @@ class AxiosCall {
       const { data } = await http.request(config);
       return data;
     } catch (error) {
-      console.error("Request Error:", error); // Debug log
+      console.error("Request Error:", error);
       throw error;
     }
   }
