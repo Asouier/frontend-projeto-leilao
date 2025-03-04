@@ -28,22 +28,20 @@ const cliente = ref<ICadastroCliente>({
   certidao: "",
 });
 
-// Regras de validação
 const rules = {
   required: (v: string) => !!v || "Campo obrigatório",
   minLength: (length: number) => (v: string) =>
     (v && v.length >= length) || `Mínimo ${length} caracteres`,
 };
 
-// Funções do formulário
 async function submitForm() {
   const { valid } = await form.value.validate();
   if (valid) {
     try {
       await apiCliente.cadastrar(cliente.value);
-      useToast("Formulário enviado com sucesso!");
+      useToast("Novo Cliente adicionado!");
     } catch (error) {
-      useToast("Erro ao cadastrar", { tipo: TYPE.ERROR });
+      useToast("Erro ao cadastrar novo Cliente", { tipo: TYPE.ERROR });
     }
   }
 }
@@ -89,13 +87,15 @@ function resetForm() {
       <v-text-field label="CNPJ" v-model="cliente.cnpj" />
       <v-text-field label="E-mail" v-model="cliente.email" />
       <v-text-field label="Telefone" v-model="cliente.telefone" />
+      <v-text-field label="CEP" v-model="cliente.cep" />
       <v-text-field label="Endereço" v-model="cliente.endereco" />
+      <v-text-field label="Numero" v-model="cliente.numero" />
       <v-text-field label="Cidade" v-model="cliente.cidade" />
       <v-text-field label="Estado" v-model="cliente.estado" />
       <v-text-field label="País" v-model="cliente.pais" />
       <v-row justify="space-between" class="w-100">
         <v-col class="d-flex justify-start">
-          <v-btn color="primary" @click="submitForm">Entrar</v-btn>
+          <v-btn color="primary" @click="submitForm">Cadastrar</v-btn>
         </v-col>
         <v-col class="d-flex justify-center">
           <v-btn color="secondary" @click="autoFill">AutoPreencher</v-btn>

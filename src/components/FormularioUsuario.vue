@@ -3,6 +3,7 @@ import { ICadastroUsuario } from "@/models/dto/ICadastroUsuario";
 import { apiUsuario } from "@/services/Usuario";
 import { useAppStore } from "@/store/app";
 import { ref } from "vue";
+import { TYPE, useToast } from "@/plugins/toast";
 
 const appStore = useAppStore();
 const form = ref();
@@ -22,7 +23,6 @@ const usuario = ref<ICadastroUsuario>({
   categoriaResponsavel: "Todas",
 });
 
-// Regras de validação
 const rules = {
   required: (v: string) => !!v || "Campo obrigatório",
   email: (v: string) => /.+@.+\..+/.test(v) || "E-mail inválido",
@@ -30,15 +30,16 @@ const rules = {
     (v && v.length >= length) || `Mínimo ${length} caracteres`,
 };
 
-// Funções de ação do formulário
 async function submitForm() {
   const { valid } = await form.value.validate();
-  usuario.value.usuarioConcessaoId = appStore.Login.id;
   if (valid) {
-    apiUsuario.adicionar(usuario.value).then((res) => {
-      alert("Formulário enviado com sucesso!");
-      console.log(res);
-    });
+    usuario.value.usuarioConcessaoId = appStore.Login.id;
+    try {
+      await apiUsuario.adicionar(usuario.value);
+      useToast("Novo Funcionario adicionado!");
+    } catch (error) {
+      useToast("Erro ao cadastrar novo Usuário", { tipo: TYPE.ERROR });
+    }
   }
 }
 function autoFill() {
@@ -140,7 +141,7 @@ function resetForm() {
       </v-row>
       <v-row justify="space-between" class="w-100">
         <v-col class="d-flex justify-start">
-          <v-btn color="primary" @click="submitForm">Entrar</v-btn>
+          <v-btn color="primary" @click="submitForm">Cadastrar</v-btn>
         </v-col>
         <v-col class="d-flex justify-center">
           <v-btn color="secondary" @click="autoFill">AutoPreencher</v-btn>

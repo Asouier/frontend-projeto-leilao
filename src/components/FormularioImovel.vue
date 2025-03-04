@@ -1,21 +1,41 @@
 <script setup lang="ts">
-import { ref } from "vue";
+import { useAppStore } from "@/store/app";
 import { ICadastroImovel } from "@/models/dto/ICadastroImovel";
 import { apiImovel } from "@/services/Imovel";
+import { TYPE, useToast } from "@/plugins/toast";
+import { TipoImovel } from "@/models/enum/TipoImovel";
+import { StatusPropriedade } from "@/models/enum/StatusPropriedade";
 
 const form = ref();
+const appStore = useAppStore();
 const imovel = ref<ICadastroImovel>({
-  tipoImovelId: 1,
-  leilaoId: 1,
-  enderecoId: 1,
+  tipoImovelId: TipoImovel.Casa,
+  leilaoId: 4,
   areaTotal: 100.0,
   quantidadeComodos: 3,
   valorMinimo: 50000,
-  statusPropriedadeId: 1,
-  usuarioCadastroId: 1,
+  statusPropriedadeId: StatusPropriedade.Disponivel,
+  usuarioCadastroId: appStore.Login.id,
   dataRecolhimento: new Date(),
   motivoRecolhimento: "",
+  cep: "",
+  endereco: "",
+  cidade: "",
+  estado: "",
+  pais: "",
+  numero: "",
+  complemento: "",
 });
+
+const tipoImovel = [
+  { text: "Residencial", value: TipoImovel.Residencial },
+  { text: "Comercial", value: TipoImovel.Comercial },
+  { text: "Rural", value: TipoImovel.Rural },
+  { text: "Industrial", value: TipoImovel.Industrial },
+  { text: "Casa", value: TipoImovel.Casa },
+  { text: "Apartamento", value: TipoImovel.Apartamento },
+  { text: "Terreno", value: TipoImovel.Terreno },
+];
 
 const rules = {
   required: (v: string) => !!v || "Campo obrigatório",
@@ -24,23 +44,33 @@ const rules = {
 async function submitForm() {
   const { valid } = await form.value.validate();
   if (valid) {
-    apiImovel.adicionar(imovel.value).then(() => {
-      alert("Formulário enviado com sucesso!");
-    });
+    try {
+      await apiImovel.adicionar(imovel.value);
+      useToast("Imóvel cadastrado com sucesso!");
+    } catch (error) {
+      useToast("Erro ao cadastrar Imóvel", { tipo: TYPE.ERROR });
+    }
   }
 }
+
 function autoFill() {
   imovel.value = {
-    tipoImovelId: 2,
-    leilaoId: 3,
-    enderecoId: 5,
+    tipoImovelId: TipoImovel.Apartamento,
+    leilaoId: 4,
     areaTotal: 120.5,
     quantidadeComodos: 4,
     valorMinimo: 70000,
-    statusPropriedadeId: 2,
-    usuarioCadastroId: 10,
+    statusPropriedadeId: StatusPropriedade.Disponivel,
+    usuarioCadastroId: appStore.Login.id,
     dataRecolhimento: new Date(),
-    motivoRecolhimento: "Venda por leilão",
+    motivoRecolhimento: "Não pagamento do IPTU",
+    cep: "12345-678",
+    endereco: "Rua Exemplo, 123",
+    cidade: "São Paulo",
+    estado: "SP",
+    pais: "Brasil",
+    numero: "123",
+    complemento: "Apartamento 101",
   };
 }
 function resetForm() {
@@ -51,30 +81,59 @@ function resetForm() {
 <template>
   <v-container>
     <v-form ref="form">
-      <v-text-field
-        label="Área Total"
-        v-model="imovel.areaTotal"
-        type="number"
-        :rules="[rules.required]"
-      />
-      <v-text-field
-        label="Quantidade de Cômodos"
-        v-model="imovel.quantidadeComodos"
-        type="number"
-      />
-      <v-text-field
-        label="Valor Mínimo"
-        v-model="imovel.valorMinimo"
-        type="number"
-      />
-      <v-textarea
-        label="Motivo do Recolhimento"
-        v-model="imovel.motivoRecolhimento"
-        :rules="[rules.required]"
-      />
+      <v-row justify="space-between" class="w-100">
+        <v-select
+          label="Tipo de Imóvel"
+          v-model="imovel.tipoImovelId"
+          :items="tipoImovel"
+          item-title="text"
+          item-value="value"
+        />
+        <v-text-field
+          label="Área Total"
+          v-model="imovel.areaTotal"
+          type="number"
+          :rules="[rules.required]"
+        />
+        <v-text-field
+          label="Quantidade de Cômodos"
+          v-model="imovel.quantidadeComodos"
+          type="number"
+        />
+        <v-text-field
+          label="Valor Mínimo"
+          v-model="imovel.valorMinimo"
+          type="number"
+        />
+      </v-row>
+      <v-row justify="space-between" class="w-100">
+        <v-textarea
+          label="Motivo do Recolhimento"
+          v-model="imovel.motivoRecolhimento"
+          :rules="[rules.required]"
+        />
+      </v-row>
+
+      <v-row justify="space-between" class="w-100">
+        <v-text-field label="Cidade" v-model="imovel.cidade" />
+        <v-text-field label="Estado" v-model="imovel.estado" />
+        <v-text-field label="País" v-model="imovel.pais" />
+      </v-row>
+      <v-row justify="space-between" class="w-100">
+        <v-text-field label="Endereço" v-model="imovel.endereco" />
+        <v-text-field label="Numero" v-model="imovel.numero" />
+        <v-text-field label="CEP" v-model="imovel.cep" />
+      </v-row>
+      <v-row justify="space-between" class="w-100">
+        <v-text-field
+          label="numero do Leilão vinculado"
+          v-model="imovel.leilaoId"
+          type="number"
+        />
+      </v-row>
       <v-row justify="space-between" class="w-100">
         <v-col class="d-flex justify-start">
-          <v-btn color="primary" @click="submitForm">Entrar</v-btn>
+          <v-btn color="primary" @click="submitForm">Cadastrar</v-btn>
         </v-col>
         <v-col class="d-flex justify-center">
           <v-btn color="secondary" @click="autoFill">AutoPreencher</v-btn>

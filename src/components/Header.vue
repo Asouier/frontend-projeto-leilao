@@ -25,7 +25,8 @@
           <strong>Cargo:</strong> {{ appStore.Login.cargoFuncao }}
         </div>
         <div v-if="appStore.Login.permissaoId">
-          <strong>Permissão ID:</strong> {{ appStore.Login.permissaoId }}
+          <strong>Permissão:</strong>
+          {{ Permissao[appStore.Login.permissaoId] }}
         </div>
         <div v-if="appStore.Login.regiaoResponsavel">
           <strong>Região Responsável:</strong>
@@ -49,6 +50,7 @@
 </template>
 
 <script setup>
+import { Permissao } from "@/models/enum/Permissao";
 import { useAppStore } from "@/store/app";
 import { computed } from "vue";
 import { useRouter } from "vue-router";
@@ -72,7 +74,7 @@ const login = () => {
 .info-container {
   display: flex;
   flex-direction: row;
-  gap: 34px;
-  font-size: 15px;
+  gap: 3.4rem;
+  font-size: 1.5rem;
 }
 </style>

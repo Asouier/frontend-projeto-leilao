@@ -1,3 +1,18 @@
-div.v-input {
-  margin-right: 20px;
+div.v-input:not(:last-child) {
+  margin-right: 2rem;
+}
+.v-overlay-container * {
+  font-size: 1.6rem;
+}
+button.v-expansion-panel-title {
+  font-size: 1.5rem;
+  max-height: 4.8rem;
+  transition: all ease-in-out 0.25s;
+  &:hover,
+  &.v-expansion-panel-title--active {
+    font-size: 1.8rem;
+  }
+}
+label.v-label.v-field-label {
+  font-size: 1.4rem;
 }

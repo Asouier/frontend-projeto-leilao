@@ -2,8 +2,8 @@ import { obterTokenApi } from "@/services/token";
 
 import axios, { AxiosRequestConfig } from "axios";
 
-const urlBase = import.meta.env.VITE_API_URL;
-//const urlBase = "http://backend:5000/api"; //temporário
+//const urlBase = import.meta.env.VITE_API_URL;
+const urlBase = "http://localhost:5000/api"; //temporário
 
 const http = axios.create({
   baseURL: urlBase,

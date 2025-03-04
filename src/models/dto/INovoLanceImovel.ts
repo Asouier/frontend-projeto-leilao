@@ -1,5 +1,5 @@
 export interface INovoLanceImovel {
-  idUsuarioArrematante: string;
-  valorDoLance: number;
+  clienteArrematanteId: number;
+  valorMinimo: number;
   idImovel: number;
 }

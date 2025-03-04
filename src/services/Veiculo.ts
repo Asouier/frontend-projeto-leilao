@@ -2,6 +2,7 @@ import { AxiosCall } from "@/https";
 import { IAtualizarVeiculo } from "@/models/dto/IAtualizarVeiculo";
 import { ICadastroVeiculo } from "@/models/dto/ICadastroVeiculo";
 import { INovoLanceVeiculo } from "@/models/dto/INovoLanceVeiculo";
+import { IVeiculo } from "@/models/dto/IVeiculo";
 
 class VeiculoService extends AxiosCall {
   adicionar<T>(novoVeiculo: ICadastroVeiculo) {
@@ -49,8 +50,8 @@ class VeiculoService extends AxiosCall {
     });
   }
 
-  buscarPorLeilao<T>(leilaoId: number) {
-    return this.axiosCall<T>({
+  buscarPorLeilao(leilaoId: number) {
+    return this.axiosCall<IVeiculo[]>({
       method: "get",
       url: `/veiculo/filtrar-por-leilao/${leilaoId}`,
     });

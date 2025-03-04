@@ -2,6 +2,7 @@ import { AxiosCall } from "@/https";
 import { IAtualizarImovel } from "@/models/dto/IAtualizarImovel";
 import { ICadastroImovel } from "@/models/dto/ICadastroImovel";
 import { INovoLanceImovel } from "@/models/dto/INovoLanceImovel";
+import { IImovel } from "@/models/dto/IImovel";
 
 class Imovel extends AxiosCall {
   adicionar<T>(novoImovel: ICadastroImovel) {
@@ -49,8 +50,8 @@ class Imovel extends AxiosCall {
     });
   }
 
-  buscarPorLeilao<T>(leilaoId: number) {
-    return this.axiosCall<T>({
+  buscarPorLeilao(leilaoId: number) {
+    return this.axiosCall<IImovel[]>({
       method: "get",
       url: `/imovel/filtrar-por-leilao/${leilaoId}`,
     });

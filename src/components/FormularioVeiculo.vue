@@ -1,12 +1,16 @@
 <script setup lang="ts">
-import { ref } from "vue";
+import { useAppStore } from "@/store/app";
 import { ICadastroVeiculo } from "@/models/dto/ICadastroVeiculo";
 import { apiVeiculo } from "@/services/Veiculo";
+import { TYPE, useToast } from "@/plugins/toast";
+import { TipoVeiculo } from "@/models/enum/TipoVeiculo";
+import { StatusPropriedade } from "@/models/enum/StatusPropriedade";
 
+const appStore = useAppStore();
 const form = ref();
 const veiculo = ref<ICadastroVeiculo>({
-  leilaoId: 1,
-  tipoVeiculoId: 1,
+  leilaoId: 6,
+  tipoVeiculoId: TipoVeiculo.Carro,
   placa: "",
   chassi: "",
   marca: "",
@@ -14,24 +18,35 @@ const veiculo = ref<ICadastroVeiculo>({
   anoFabricacao: new Date().getFullYear(),
   cor: "",
   valorMinimo: 10000,
-  statusPropriedadeId: 1,
-  usuarioCadastroId: 1,
+  statusPropriedadeId: StatusPropriedade.Disponivel,
+  usuarioCadastroId: appStore.Login.id,
   dataRecolhimento: new Date(),
   motivoRecolhimento: "",
 });
 
+const tipoVeiculo = [
+  { text: "Motocicleta", value: TipoVeiculo.Motocicleta },
+  { text: "Carro", value: TipoVeiculo.Carro },
+  { text: "Van", value: TipoVeiculo.Van },
+  { text: "Ônibus", value: TipoVeiculo.Onibus },
+  { text: "Caminhão", value: TipoVeiculo.Caminhao },
+];
+
 async function submitForm() {
   const { valid } = await form.value.validate();
   if (valid) {
-    apiVeiculo.adicionar(veiculo.value).then((res) => {
-      console.log("Veículo cadastrado:", res);
-    });
+    try {
+      await apiVeiculo.adicionar(veiculo.value);
+      useToast("Veículo cadastrado com sucesso!");
+    } catch (error) {
+      useToast("Erro ao cadastrar Veículo", { tipo: TYPE.ERROR });
+    }
   }
 }
 function autoFill() {
   veiculo.value = {
-    leilaoId: 2,
-    tipoVeiculoId: 3,
+    leilaoId: 6,
+    tipoVeiculoId: TipoVeiculo.Motocicleta,
     placa: "ABC-1234",
     chassi: "9BWZZZ377VT004251",
     marca: "Toyota",
@@ -39,8 +54,8 @@ function autoFill() {
     anoFabricacao: 2022,
     cor: "Prata",
     valorMinimo: 80000,
-    statusPropriedadeId: 1,
-    usuarioCadastroId: 5,
+    statusPropriedadeId: StatusPropriedade.Disponivel,
+    usuarioCadastroId: appStore.Login.id,
     dataRecolhimento: new Date(),
     motivoRecolhimento: "Venda judicial",
   };
@@ -53,17 +68,43 @@ function resetForm() {
 <template>
   <v-container>
     <v-form ref="form">
-      <v-text-field label="Placa" v-model="veiculo.placa" />
-      <v-text-field label="Marca" v-model="veiculo.marca" />
-      <v-text-field label="Modelo" v-model="veiculo.modelo" />
-      <v-text-field
-        label="Ano de Fabricação"
-        v-model="veiculo.anoFabricacao"
-        type="number"
-      />
+      <v-row justify="space-between" class="w-100">
+        <v-select
+          label="Tipo de veículo"
+          v-model="veiculo.tipoVeiculoId"
+          :items="tipoVeiculo"
+          item-title="text"
+          item-value="value"
+        />
+      </v-row>
+      <v-row justify="space-between" class="w-100">
+        <v-text-field label="Placa" v-model="veiculo.placa" />
+        <v-text-field label="Chassi" v-model="veiculo.chassi" />
+        <v-text-field label="Marca" v-model="veiculo.marca" />
+        <v-text-field label="Modelo" v-model="veiculo.modelo" />
+        <v-text-field label="Cor" v-model="veiculo.cor" />
+        <v-text-field
+          label="Ano de Fabricação"
+          v-model="veiculo.anoFabricacao"
+          type="number"
+        />
+      </v-row>
+      <v-row justify="space-between" class="w-100">
+        <v-textarea
+          label="Motivo do Recolhimento"
+          v-model="veiculo.motivoRecolhimento"
+        />
+      </v-row>
+      <v-row justify="space-between" class="w-100">
+        <v-text-field
+          label="numero do Leilão vinculado"
+          v-model="veiculo.leilaoId"
+          type="number"
+        />
+      </v-row>
       <v-row justify="space-between" class="w-100">
         <v-col class="d-flex justify-start">
-          <v-btn color="primary" @click="submitForm">Entrar</v-btn>
+          <v-btn color="primary" @click="submitForm">Cadastrar</v-btn>
         </v-col>
         <v-col class="d-flex justify-center">
           <v-btn color="secondary" @click="autoFill">AutoPreencher</v-btn>

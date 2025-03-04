@@ -3,6 +3,7 @@ import { ILogin } from "@/models/dto/ILogin";
 import { apiCredencial } from "@/services/Credencial";
 import { useAppStore } from "@/store/app";
 import { ref } from "vue";
+import { TYPE, useToast } from "@/plugins/toast";
 
 const appStore = useAppStore();
 const form = ref();
@@ -10,6 +11,8 @@ const loginData = ref<ILogin>({
   nomeUsuario: "",
   senha: "",
 });
+
+const loading = ref(false);
 
 const rules = {
   required: (v: string) => !!v || "Campo obrigatório",
@@ -20,10 +23,17 @@ const rules = {
 async function login() {
   const { valid } = await form.value.validate();
   if (valid) {
-    apiCredencial.acessar(loginData.value).then((res) => {
-      appStore.setLogin(res.resultado);
-      appStore.token = res.token;
-    });
+    loading.value = true;
+
+    try {
+      const data = await apiCredencial.acessar(loginData.value);
+      appStore.setLogin(data.resultado);
+      appStore.token = data.token;
+    } catch (error) {
+      useToast("Usuário e senha não são compativeis", { tipo: TYPE.ERROR });
+    } finally {
+      loading.value = false;
+    }
   }
 }
 
@@ -66,7 +76,9 @@ function resetForm() {
 
       <v-row justify="space-between" class="w-100">
         <v-col class="d-flex justify-start">
-          <v-btn color="primary" @click="login">Entrar</v-btn>
+          <v-btn color="primary" @click="login" :disabled="loading">
+            Entrar
+          </v-btn>
         </v-col>
         <v-col class="d-flex justify-center">
           <v-btn class="mr-2" color="secondary" @click="autoFill(1)">
@@ -76,6 +88,12 @@ function resetForm() {
         </v-col>
         <v-col class="d-flex justify-end">
           <v-btn color="secondary" @click="resetForm">Resetar</v-btn>
+        </v-col>
+      </v-row>
+
+      <v-row justify="center" v-if="loading">
+        <v-col class="d-flex justify-center">
+          <v-progress-circular indeterminate color="primary" />
         </v-col>
       </v-row>
     </v-form>

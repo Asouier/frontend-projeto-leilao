@@ -1,7 +1,6 @@
 export interface ICadastroImovel {
   tipoImovelId: number;
   leilaoId: number;
-  enderecoId: number;
   areaTotal: number;
   quantidadeComodos?: number;
   valorMinimo: number;
@@ -9,4 +8,11 @@ export interface ICadastroImovel {
   usuarioCadastroId: number;
   dataRecolhimento: Date;
   motivoRecolhimento: string;
+  cep?: string;
+  endereco?: string;
+  cidade?: string;
+  estado?: string;
+  pais?: string;
+  numero?: string;
+  complemento?: string;
 }

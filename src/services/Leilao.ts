@@ -3,8 +3,8 @@ import { IAtualizarLeilao } from "@/models/dto/IAtualizarLeilao";
 import { ICadastroLeilao } from "@/models/dto/ICadastroLeilao";
 
 class Leilao extends AxiosCall {
-  adicionar<T>(novoLeilao: ICadastroLeilao) {
-    return this.axiosCall<T>({
+  adicionar(novoLeilao: ICadastroLeilao) {
+    return this.axiosCall<string>({
       method: "post",
       url: `/leilao/adicionar`,
       data: novoLeilao,
