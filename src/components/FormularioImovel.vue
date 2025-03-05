@@ -28,13 +28,12 @@ const imovel = ref<ICadastroImovel>({
 });
 
 const tipoImovel = [
-  { text: "Residencial", value: TipoImovel.Residencial },
-  { text: "Comercial", value: TipoImovel.Comercial },
-  { text: "Rural", value: TipoImovel.Rural },
-  { text: "Industrial", value: TipoImovel.Industrial },
   { text: "Casa", value: TipoImovel.Casa },
   { text: "Apartamento", value: TipoImovel.Apartamento },
   { text: "Terreno", value: TipoImovel.Terreno },
+  { text: "Edifício Comercial", value: TipoImovel.EdificioComercial },
+  { text: "Espaço Rural", value: TipoImovel.EspacoRural },
+  { text: "Industrial", value: TipoImovel.Industrial },
 ];
 
 const rules = {

@@ -18,6 +18,7 @@ declare module 'vue' {
     'Leilões': typeof import('./components/Leilões.vue')['default']
     RouterLink: typeof import('vue-router')['RouterLink']
     RouterView: typeof import('vue-router')['RouterView']
+    Teste: typeof import('./components/teste.vue')['default']
     Toast: typeof import('./components/Toast.vue')['default']
   }
 }

@@ -8,6 +8,8 @@ export interface ICadastroLeilao {
   usuarioCadastroId: number;
   usuarioAprovacaoId?: number;
   taxaAdministrativa: number;
+  entidadeFinanceira: string;
+  incrementoLance: number;
   cep?: string;
   endereco?: string;
   cidade?: string;

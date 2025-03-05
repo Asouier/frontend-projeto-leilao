@@ -12,13 +12,14 @@ const ultimoCadastro = ref("");
 const leilao = ref<ICadastroLeilao>({
   tipoLeilaoId: TipoLeilao.Presencial,
   statusId: StatusLeilao.Ativo,
-  enderecoId: undefined,
   dataHoraInicio: "",
   dataHoraFim: "",
   urlLeilao: "",
   usuarioCadastroId: appStore.Login.id,
   usuarioAprovacaoId: appStore.Login.id,
   taxaAdministrativa: 0,
+  entidadeFinanceira: "",
+  incrementoLance: 0,
   cep: "",
   endereco: "",
   cidade: "",
@@ -70,13 +71,14 @@ function autoFill() {
   leilao.value = {
     tipoLeilaoId: TipoLeilao.Presencial,
     statusId: StatusLeilao.Ativo,
-    enderecoId: 101,
     dataHoraInicio: formatDateTime(new Date()),
     dataHoraFim: formatDateTime(new Date(Date.now() + 360000000)),
     urlLeilao: "https://www.exemplo.com/leilao",
-    usuarioCadastroId: 2,
-    usuarioAprovacaoId: 2,
+    usuarioCadastroId: appStore.Login.id,
+    usuarioAprovacaoId: appStore.Login.id,
     taxaAdministrativa: 5.5,
+    entidadeFinanceira: "07.786.304/0001-75",
+    incrementoLance: 500,
     cep: "12345-678",
     endereco: "Rua Exemplo, 123",
     cidade: "São Paulo",
@@ -141,6 +143,15 @@ function resetForm() {
           label="Taxa Administrativa (%)"
           v-model="leilao.taxaAdministrativa"
           type="number"
+        />
+        <v-text-field
+          label="Incremento de lances (R$)"
+          v-model="leilao.incrementoLance"
+          type="number"
+        />
+        <v-text-field
+          label="CNPJ entidade financeira"
+          v-model="leilao.entidadeFinanceira"
         />
       </v-row>
       <v-row justify="space-between" class="w-100">

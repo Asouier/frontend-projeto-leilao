@@ -4,6 +4,7 @@ import { apiUsuario } from "@/services/Usuario";
 import { useAppStore } from "@/store/app";
 import { ref } from "vue";
 import { TYPE, useToast } from "@/plugins/toast";
+import { Permissao } from "@/models/enum/Permissao";
 
 const appStore = useAppStore();
 const form = ref();
@@ -22,6 +23,14 @@ const usuario = ref<ICadastroUsuario>({
   regiaoResponsavel: "",
   categoriaResponsavel: "Todas",
 });
+
+const permissoes = [
+  { text: "Super Administrador", value: Permissao.SuperAdministrador },
+  { text: "Administrador de Leilões", value: Permissao.AdministradorDeLeiloes },
+  { text: "Leiloeiro", value: Permissao.Leiloeiro },
+  { text: "Gestor de Propriedades", value: Permissao.GestorDePropriedades },
+  { text: "Auditor", value: Permissao.Auditor },
+];
 
 const rules = {
   required: (v: string) => !!v || "Campo obrigatório",
@@ -49,12 +58,12 @@ function autoFill() {
     rg: "12.345.678-9",
     cargoFuncao: "Gerente",
     entidadeResponsavel: "Empresa XYZ",
-    usuario: "joaosilva",
-    senha: "senha123",
+    usuario: "adm.joaosilva",
+    senha: "AdmSenha123",
     email: "joao@email.com",
     telefone: "(11) 91234-5678",
-    permissaoId: 2,
-    usuarioConcessaoId: 1,
+    permissaoId: 1,
+    usuarioConcessaoId: 4,
     regiaoResponsavel: "Sudeste",
     categoriaResponsavel: "Financeiro",
   };
@@ -119,11 +128,12 @@ function resetForm() {
         />
       </v-row>
       <v-row justify="space-between" class="w-100">
-        <v-text-field
-          label="ID Permissão"
+        <v-select
+          label="Nivel de permissão"
           v-model="usuario.permissaoId"
-          type="number"
-          :rules="[rules.required]"
+          :items="permissoes"
+          item-title="text"
+          item-value="value"
         />
       </v-row>
       <v-row justify="space-between" class="w-100">

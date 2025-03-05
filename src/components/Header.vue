@@ -1,10 +1,6 @@
 <template>
   <v-app-bar color="primary" density="compact">
     <v-container class="d-flex align-center">
-      <v-avatar class="mr-3">
-        <v-icon>mdi-account-circle</v-icon>
-      </v-avatar>
-
       <div class="info-container">
         <div v-if="appStore.Login.nomeUsuario">
           <strong>Usuário:</strong> {{ appStore.Login.nomeUsuario }}
@@ -70,7 +66,7 @@ const login = () => {
 };
 </script>
 
-<style scoped>
+<style>
 .info-container {
   display: flex;
   flex-direction: row;

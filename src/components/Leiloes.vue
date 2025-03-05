@@ -3,74 +3,28 @@ import { useAppStore } from "@/store/app";
 import { apiLeilao } from "@/services/Leilao";
 import { apiVeiculo } from "@/services/Veiculo";
 import { apiImovel } from "@/services/Imovel";
-import { apiEndereco } from "@/services/Endereco";
-import { apiLog } from "@/services/Log";
 import { ILeilao } from "@/models/dto/ILeilao";
 import { TipoLeilao } from "@/models/enum/TipoLeilao";
 import { IVeiculo } from "@/models/dto/IVeiculo";
 import { IImovel } from "@/models/dto/IImovel";
-import { ILog } from "@/models/dto/ILog";
 import { INovoLanceImovel } from "@/models/dto/INovoLanceImovel";
 import { INovoLanceVeiculo } from "@/models/dto/INovoLanceVeiculo";
 import { TipoImovel } from "@/models/enum/TipoImovel";
 import { TYPE, useToast } from "@/plugins/toast";
 
-onMounted(() => {
-  listarLeiloes();
-});
-
 const appStore = useAppStore();
 const leiloes = ref<ILeilao[]>([]);
 const veiculosPorLeilao = ref<{ [leilaoId: number]: IVeiculo[] }>({});
 const imoveisPorLeilao = ref<{ [leilaoId: number]: IImovel[] }>({});
-const lanceMinimoVeiculos = ref<{ [veiculoId: number]: number }>({});
-const lanceMinimoImoveis = ref<{ [imovelId: number]: number }>({});
-const historicoLances = ref<{ [lances: number]: ILog[] }>({});
+const lanceMinimo = ref<{ [propriedadeId: number]: number }>({});
 
 async function listarLeiloes() {
   try {
     const response = await apiLeilao.listarTodos<ILeilao[]>();
     leiloes.value = response;
-
-    const leiloesPresenciais = response.filter(
-      (leilao) => leilao.tipoLeilaoId === TipoLeilao.Presencial
-    );
-
-    await Promise.all(
-      leiloesPresenciais.map(async (leilao) => {
-        try {
-          const endereco = await apiEndereco.buscarPorId(leilao.enderecoId);
-          Object.assign(leilao, endereco);
-        } catch (error) {
-          console.error(
-            `Erro ao buscar endereço para leilão ${leilao.id}`,
-            error
-          );
-        }
-      })
-    );
   } catch (error) {
     console.error("Erro ao listar leilões", error);
   }
-}
-
-async function getHistoricoLances(leilaoId: number, propriedadeId: number) {
-  try {
-    const response = await apiLog.buscarPorId(leilaoId, propriedadeId);
-    historicoLances.value[propriedadeId] = response;
-  } catch (error) {
-    console.error(
-      `Erro ao buscar histórico de lances para propriedade ${propriedadeId}`,
-      error
-    );
-  }
-}
-function extrairEFormatarNumero(texto: string): string | null {
-  const match = texto.match(/(?:\((?:R\$)?([\d.,]+)\)|(?:R\$)?([\d.,]+))/);
-  if (!match) return null;
-  const numeroStr = match[1] || match[2];
-  const numero = parseFloat(numeroStr.replace(/\./g, "").replace(",", "."));
-  return numero.toLocaleString("pt-BR", { style: "currency", currency: "BRL" });
 }
 
 async function getPropriedadesLeiloadas(leilaoId: number) {
@@ -79,18 +33,13 @@ async function getPropriedadesLeiloadas(leilaoId: number) {
     const imoveisLeiloados = await apiImovel.buscarPorLeilao(leilaoId);
     veiculosPorLeilao.value[leilaoId] = veiculosLeiloados;
     imoveisPorLeilao.value[leilaoId] = imoveisLeiloados;
+    veiculosLeiloados.forEach((veiculo) => {
+      lanceMinimo.value[veiculo.id] = veiculo.valorMinimo;
+    });
 
-    // Atualiza os valores mínimos dos veículos
-    for (const veiculo of veiculosLeiloados) {
-      lanceMinimoVeiculos.value[veiculo.id] = veiculo.valorMinimo + 200;
-      await getHistoricoLances(leilaoId, veiculo.id);
-    }
-
-    // Atualiza os valores mínimos dos imóveis
-    for (const imovel of imoveisLeiloados) {
-      lanceMinimoImoveis.value[imovel.id] = imovel.valorMinimo + 200;
-      await getHistoricoLances(leilaoId, imovel.id);
-    }
+    imoveisLeiloados.forEach((imovel) => {
+      lanceMinimo.value[imovel.id] = imovel.valorMinimo;
+    });
   } catch (error) {
     console.error("Erro ao listar propriedades leiloadas", error);
   }
@@ -127,20 +76,16 @@ async function novoLanceImovel(
   };
   try {
     await apiImovel.novoLance(lance);
-    useToast("Novo lance atribuído");
-
+    useToast("Novo lance atribudo");
     const imoveisLeiloados = await apiImovel.buscarPorLeilao(leilaoId);
     imoveisPorLeilao.value = {
       ...imoveisPorLeilao.value,
       [leilaoId]: imoveisLeiloados,
     };
-
     const imovelAtualizado = imoveisLeiloados.find((v) => v.id === id);
     if (imovelAtualizado) {
-      lanceMinimoImoveis.value[id] = imovelAtualizado.valorMinimo + 200;
+      lanceMinimo.value[id] = imovelAtualizado.valorMinimo;
     }
-
-    await getHistoricoLances(leilaoId, id);
   } catch (error) {
     console.error("Erro ao dar o lance", error);
   }
@@ -165,8 +110,7 @@ async function novoLanceVeiculo(
   };
   try {
     await apiVeiculo.novoLance(lance);
-    useToast("Novo lance atribuído");
-
+    useToast("Novo lance atribudo");
     const veiculosLeiloados = await apiVeiculo.buscarPorLeilao(leilaoId);
     veiculosPorLeilao.value = {
       ...veiculosPorLeilao.value,
@@ -175,198 +119,58 @@ async function novoLanceVeiculo(
 
     const veiculoAtualizado = veiculosLeiloados.find((v) => v.id === id);
     if (veiculoAtualizado) {
-      lanceMinimoVeiculos.value[id] = veiculoAtualizado.valorMinimo + 200;
+      lanceMinimo.value[id] = veiculoAtualizado.valorMinimo;
     }
-
-    await getHistoricoLances(leilaoId, id);
   } catch (error) {
     console.error("Erro ao dar o lance", error);
   }
 }
 
-function prazoDeEncerramento(dataHoraFim: string): boolean {
-  const dataFim = new Date(dataHoraFim);
-  const dataAtual = new Date();
-  return dataFim < dataAtual;
-}
+onMounted(() => {
+  listarLeiloes();
+});
 </script>
 <template>
-  <v-expansion-panels multiple>
-    <v-expansion-panel
-      v-for="(leilao, index) in leiloes"
-      :key="index"
-      :disabled="prazoDeEncerramento(leilao.dataHoraFim)"
-    >
-      <v-expansion-panel-title @click="getPropriedadesLeiloadas(leilao.id)">
-        <div class="tituloAcordeao">
+  <v-container>
+    <div class="loopLeiloes" v-for="leilao in leiloes" :key="leilao.id">
+      <div class="tituloLeilao d-flex">
+        <h3>Leilão #{{ leilao.id }} - {{ TipoLeilao[leilao.tipoLeilaoId] }}</h3>
+        <h3>Encerramento: {{ formatarData(leilao.dataHoraFim) }}</h3>
+      </div>
+      <div
+        class="propriedade veiculos"
+        v-for="veiculo in veiculosPorLeilao[leilao.id]"
+      >
+        <div class="informacoes">
           <span>
-            Leilão #{{ leilao.id }}{{ leilao.tipoLeilaoId }} -
-            {{ TipoLeilao[leilao.tipoLeilaoId] }}
+            Veículo #{{ veiculo.id }} - Valor Mínimo: R$
+            {{ veiculo.valorMinimo }}
           </span>
-          <span>Encerramento: {{ formatarData(leilao.dataHoraFim) }}</span>
+          <span>
+            Motivo de Recolhimento: {{ veiculo.motivoRecolhimento }}
+          </span>
         </div>
-      </v-expansion-panel-title>
-      <v-expansion-panel-text>
-        <div
-          class="propriedade text-center"
-          v-if="leilao.tipoLeilaoId === TipoLeilao.Presencial"
-        >
-          <h3>Esse leilão está disponível apenas presencialmente</h3>
-          <div class="informacoes">
-            <span> Endereço: {{ leilao.descricao }} </span>
-            <span> Cep: {{ leilao.cep }} </span>
-            <span> cidade: {{ leilao.cidade }} </span>
-            <span> estado: {{ leilao.estado }} </span>
-            <span> {{ leilao.complemento ? leilao.complemento : "" }} </span>
+      </div>
+      <div
+        class="propriedade imoveis"
+        v-for="imovel in imoveisPorLeilao[leilao.id]"
+      >
+        <div class="informacoes">
+          <p>Imóvel #{{ imovel.id }}</p>
+          <p>Área total: {{ imovel.areaTotal }}</p>
+          <p>Tipo do imóvel: {{ TipoImovel[imovel.tipoImovelId] }}</p>
+          <p>Valor Mínimo: R$ {{ imovel.valorMinimo }}</p>
+          <p>Motivo de Recolhimento: {{ imovel.motivoRecolhimento }}</p>
+        </div>
+        <div class="lances">
+          <div class="valores">
+            <p>{{ imovel.valorMinimo }}</p>
+            <p>{{ lanceMinimo[imovel.id] }}</p>
           </div>
         </div>
-        <div
-          class="propriedade veiculo"
-          v-if="veiculosPorLeilao[leilao.id]?.length"
-        >
-          <h3>Veículos Leiloados</h3>
-          <div
-            class="conteudo"
-            v-for="veiculo in veiculosPorLeilao[leilao.id]"
-            :key="veiculo.id"
-          >
-            <div class="informacoes">
-              <span>
-                Veículo #{{ veiculo.id }} - Valor Mínimo: R$
-                {{ veiculo.valorMinimo }}
-              </span>
-              <span>
-                Motivo de Recolhimento: {{ veiculo.motivoRecolhimento }}
-              </span>
-            </div>
-            <div
-              class="lances"
-              v-if="leilao.tipoLeilaoId !== TipoLeilao.Presencial"
-            >
-              <div class="valores">
-                <h4>Lance Mínimo</h4>
-                <span class="proximoLance">
-                  {{
-                    extrairEFormatarNumero(
-                      lanceMinimoVeiculos[veiculo.id].toString()
-                    )
-                  }}
-                </span>
-                <v-btn
-                  color="primary"
-                  @click="
-                    novoLanceVeiculo(
-                      veiculo.id,
-                      lanceMinimoVeiculos[veiculo.id] || 0,
-                      veiculo.valorMinimo,
-                      leilao.id
-                    )
-                  "
-                >
-                  Dar Lance
-                </v-btn>
-                {{
-                  veiculo.clienteArrematanteId == appStore.Login.id
-                    ? "O último lance foi seu"
-                    : ""
-                }}
-              </div>
-              <div class="historico">
-                <h4>Último lance</h4>
-                <ul v-if="historicoLances[veiculo.id]?.length">
-                  <li
-                    v-for="(lance, index) in historicoLances[veiculo.id]
-                      .slice(-4)
-                      .reverse()"
-                    :key="index"
-                  >
-                    R$ {{ extrairEFormatarNumero(lance.acao) }}
-                  </li>
-                </ul>
-                <p v-else>Nenhum lance registrado.</p>
-              </div>
-            </div>
-          </div>
-        </div>
-
-        <!-- Exibe os imóveis leiloados -->
-        <div
-          class="propriedade imovel"
-          v-if="imoveisPorLeilao[leilao.id]?.length"
-        >
-          <h3>Imóveis Leiloados</h3>
-          <div
-            class="conteudo"
-            v-for="imovel in imoveisPorLeilao[leilao.id]"
-            :key="imovel.id"
-          >
-            <div class="informacoes">
-              <span> Imóvel #{{ imovel.id }} </span>
-              <span> Área total: {{ imovel.areaTotal }} </span>
-              <span>
-                Tipo do imóvel: {{ TipoImovel[imovel.tipoImovelId] }}
-              </span>
-              <span> Valor Mínimo: R$ {{ imovel.valorMinimo }} </span>
-              <span>
-                Motivo de Recolhimento: {{ imovel.motivoRecolhimento }}
-              </span>
-            </div>
-            <div class="lances">
-              <div class="valores">
-                <h4>Lance Mínimo</h4>
-                <span class="proximoLance">
-                  <span class="proximoLance">
-                    {{
-                      extrairEFormatarNumero(
-                        lanceMinimoImoveis[imovel.id].toString()
-                      )
-                    }}
-                  </span>
-                </span>
-                <v-btn
-                  color="primary"
-                  @click="
-                    novoLanceImovel(
-                      imovel.id,
-                      lanceMinimoImoveis[imovel.id] || 0,
-                      imovel.valorMinimo,
-                      leilao.id
-                    )
-                  "
-                >
-                  Dar Lance
-                </v-btn>
-              </div>
-              <div class="historico">
-                <h4>Último lance</h4>
-                <ul v-if="historicoLances[imovel.id]?.length">
-                  <li
-                    v-for="(lance, index) in historicoLances[imovel.id]
-                      .slice(-4)
-                      .reverse()"
-                    :key="index"
-                  >
-                    R$ {{ extrairEFormatarNumero(lance.acao) }}
-                  </li>
-                </ul>
-                <p v-else>Nenhum lance registrado.</p>
-              </div>
-            </div>
-          </div>
-        </div>
-
-        <!-- Mensagem se não houver propriedades leiloadas -->
-        <div
-          v-if="
-            !veiculosPorLeilao[leilao.id]?.length &&
-            !imoveisPorLeilao[leilao.id]?.length
-          "
-        >
-          Nenhuma propriedade leiloada encontrada.
-        </div>
-      </v-expansion-panel-text>
-    </v-expansion-panel>
-  </v-expansion-panels>
+      </div>
+    </div>
+  </v-container>
 </template>
 
 <style lang="scss">

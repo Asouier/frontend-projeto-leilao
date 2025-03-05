@@ -1,9 +1,8 @@
 export enum TipoImovel {
-  Residencial = 1,
-  Comercial = 2,
-  Rural = 3,
-  Industrial = 4,
-  Casa = 5,
-  Apartamento = 6,
-  Terreno = 7,
+  Casa = 1,
+  Apartamento = 2,
+  Terreno = 3,
+  EdificioComercial = 4,
+  EspacoRural = 5,
+  Industrial = 6,
 }

@@ -40,13 +40,18 @@ async function login() {
 function autoFill(perfil: number) {
   if (perfil == 1) {
     loginData.value = {
-      nomeUsuario: "loja.maria",
-      senha: "Loja123456Maria",
+      nomeUsuario: "carlos.tech",
+      senha: "segredo456",
+    };
+  } else if (perfil == 2) {
+    loginData.value = {
+      nomeUsuario: "adm.joaosilva",
+      senha: "AdmSenha123",
     };
   } else {
     loginData.value = {
-      nomeUsuario: "administrador",
-      senha: "Adm12345@2025",
+      nomeUsuario: "anasouza",
+      senha: "senha789",
     };
   }
 }
@@ -63,12 +68,14 @@ function resetForm() {
         label="Login"
         v-model="loginData.nomeUsuario"
         :rules="[rules.required]"
+        :disabled="loading"
       />
       <v-text-field
         label="Senha"
         v-model="loginData.senha"
         type="password"
         :rules="[rules.required, rules.minLength(6)]"
+        :disabled="loading"
       />
       <v-row justify="space-between" class="w-100">
         <v-col class="d-flex justify-center"> AutoPreencher </v-col>
@@ -81,13 +88,35 @@ function resetForm() {
           </v-btn>
         </v-col>
         <v-col class="d-flex justify-center">
-          <v-btn class="mr-2" color="secondary" @click="autoFill(1)">
-            Cliente
+          <v-btn
+            class="mr-2"
+            color="secondary"
+            @click="autoFill(1)"
+            :disabled="loading"
+          >
+            Cliente 1
           </v-btn>
-          <v-btn color="secondary" @click="autoFill(2)"> Administrador </v-btn>
+          <v-btn
+            class="mr-2"
+            color="secondary"
+            @click="autoFill(2)"
+            :disabled="loading"
+          >
+            Administrador
+          </v-btn>
+          <v-btn
+            class="mr-2"
+            color="secondary"
+            @click="autoFill(3)"
+            :disabled="loading"
+          >
+            Cliente 2
+          </v-btn>
         </v-col>
         <v-col class="d-flex justify-end">
-          <v-btn color="secondary" @click="resetForm">Resetar</v-btn>
+          <v-btn color="secondary" @click="resetForm" :disabled="loading"
+            >Resetar</v-btn
+          >
         </v-col>
       </v-row>
 
